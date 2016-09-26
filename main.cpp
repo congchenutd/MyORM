@@ -3,7 +3,7 @@
 #include <QSqlQuery>
 #include <QDebug>
 #include "DAO.h"
-#include "Library.h"
+#include "LibraryBase.h"
 #include "LibraryDAO.h"
 
 bool openDB(const QString& name)
@@ -21,7 +21,7 @@ bool openDB(const QString& name)
 int main(int argc, char *argv[])
 {
 	openDB("Test.db");
-	Library* library = Library::getInstance();
+	LibraryBase* library = LibraryBase::getInstance();
 
 	Provider* provider = new Provider(2);
 	provider->setName("Hello");

@@ -1,11 +1,12 @@
 #include "DAO.h"
-#include "Library.h"
+#include "LibraryBase.h"
 #include "Persistable.h"
 #include "LibraryDAO.h"
 #include <QMetaProperty>
 #include <QSqlQuery>
 #include <QVariant>
 #include <QDebug>
+#include <QSqlError>
 
 DAO::DAO(const QString& className)
     : _className(className)
@@ -116,8 +117,14 @@ void DAO::insert(Persistable* persistable)
 
     query.bindValue(":ID", persistable->getID());
     foreach (const Mapping& mapping, _mappings)
+    {
         query.bindValue(":" + mapping._fieldName, persistable->property(mapping._propertyName.toLatin1()));
+        qDebug() << mapping._propertyName.toLatin1();
+        qDebug() << persistable->property(mapping._propertyName.toLatin1());
+    }
     query.exec();
+
+    qDebug() << query.lastError().text();
 
     insertRelationships(persistable);
 }
@@ -163,7 +170,7 @@ Persistable* DAO::load(int id)
     }
 
     // Load relationships
-    Library* library = Library::getInstance();
+    LibraryBase* library = LibraryBase::getInstance();
     foreach (const Relationship& relationship, getAllRelationships())
     {
         // Select foreign obj id from the relation table
@@ -225,7 +232,8 @@ void DAO::insertRelationships(Persistable* persistable)
     {
         const char* propertyName = relationship.getForeignClassName().toLatin1();
         Persistable* foreignObj = persistable->property(propertyName).value<Persistable*>();
-        query.exec(tr("insert into %1 values (%2, %3)")
+        if (foreignObj != 0)
+            query.exec(tr("insert into %1 values (%2, %3)")
                                 .arg(relationship.getRelationshipTableName())
                                 .arg(persistable->getID())
                                 .arg(foreignObj->getID()));

@@ -18,7 +18,8 @@ public:
     Persistable(int id, DAO* dao);
     virtual ~Persistable() {}
 
-    int getID() const;
+    int  getID()  const;
+    DAO* getDAO() const;
 
     // Remove this object from the database
     // WARNING: stop using this object after destroy()

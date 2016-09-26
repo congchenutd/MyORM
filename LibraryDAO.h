@@ -4,7 +4,7 @@
 #include <QList>
 #include <QObject>
 
-class Library;
+class LibraryBase;
 class DAO;
 
 /**
@@ -18,8 +18,8 @@ public:
     // A persistable class is registered via its DAO object
     void registerDAO(DAO* dao);
 
-    void load(Library* library);
-    void save(Library* library);
+    void load(LibraryBase* library);
+    void save(LibraryBase* library);
 
 private:
     LibraryDAO();

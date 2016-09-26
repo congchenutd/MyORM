@@ -1,5 +1,5 @@
-#ifndef LIBRARY_H
-#define LIBRARY_H
+#ifndef LIBRARY_BASE_H
+#define LIBRARY_BASE_H
 
 #include <QMap>
 #include <QString>
@@ -8,13 +8,13 @@ class Persistable;
 class LibraryDAO;
 
 /**
- * Library manages all the persistable objects
+ * LibraryBase manages all the persistable objects
  * LibraryDAO loads and saves the library
  */
-class Library
+class LibraryBase
 {
 public:
-    static Library* getInstance();
+    static LibraryBase* getInstance();
 
     // Add a persistable object to the library
     void addPersistable(Persistable* persistable);
@@ -31,14 +31,14 @@ public:
     // Save all the objects of registered in LibraryDAO
     void save();
 
-private:
-    Library();
+protected:
+    LibraryBase();
 
-private:
+protected:
     // Class name -> [ID -> Persistable]
     QMap<QString, QMap<int, Persistable*>> _name2Persistables;
 
     LibraryDAO* _dao;
 };
 
-#endif // LIBRARY_H
+#endif // LIBRARY_BASE_H

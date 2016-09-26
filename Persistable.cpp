@@ -9,6 +9,10 @@ int Persistable::getID() const {
     return _id;
 }
 
+DAO* Persistable::getDAO() const {
+    return _dao;
+}
+
 void Persistable::destroy() {
     _dao->remove(this);
 }

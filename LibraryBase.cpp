@@ -1,36 +1,36 @@
-#include "Library.h"
+#include "LibraryBase.h"
 #include "LibraryDAO.h"
 #include "Persistable.h"
 
-Library* Library::getInstance()
+LibraryBase* LibraryBase::getInstance()
 {
-    static Library instance;
+    static LibraryBase instance;
     return &instance;
 }
 
-Library::Library()
+LibraryBase::LibraryBase()
     : _dao(LibraryDAO::getInstance())
 {}
 
-void Library::addPersistable(Persistable* persistable)
+void LibraryBase::addPersistable(Persistable* persistable)
 {
     QString className = persistable->metaObject()->className();
     _name2Persistables[className].insert(persistable->getID(), persistable);
 }
 
-Persistable* Library::getPersistable(const QString& className, int id) {
+Persistable* LibraryBase::getPersistable(const QString& className, int id) {
     return _name2Persistables[className][id];
 }
 
-QList<Persistable *> Library::getPersistables(const QString& className) {
+QList<Persistable *> LibraryBase::getPersistables(const QString& className) {
     return _name2Persistables[className].values();
 }
 
-void Library::load() {
+void LibraryBase::load() {
     _dao->load(this);
 }
 
-void Library::save() {
+void LibraryBase::save() {
     _dao->save(this);
 }
 

@@ -17,7 +17,7 @@ SOURCES +=\
     Persistable.cpp \
     DAO.cpp \
     Relationship.cpp \
-    Library.cpp \
+	LibraryBase.cpp \
     LibraryDAO.cpp \
     Example.cpp
 
@@ -25,7 +25,7 @@ HEADERS  += \
     Persistable.h \
     DAO.h \
     Relationship.h \
-    Library.h \
+	LibraryBase.h \
     LibraryDAO.h \
     Example.h
 

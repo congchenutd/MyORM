@@ -1,5 +1,5 @@
 #include "DAO.h"
-#include "Library.h"
+#include "LibraryBase.h"
 #include "LibraryDAO.h"
 #include "Persistable.h"
 
@@ -16,7 +16,7 @@ void LibraryDAO::registerDAO(DAO* dao) {
     _daos << dao;
 }
 
-void LibraryDAO::load(Library* library)
+void LibraryDAO::load(LibraryBase* library)
 {
     QSqlQuery query;
     foreach (DAO* dao, _daos)
@@ -32,12 +32,13 @@ void LibraryDAO::load(Library* library)
     }
 }
 
-void LibraryDAO::save(Library* library)
+void LibraryDAO::save(LibraryBase* library)
 {
     if (QSqlDatabase::database().transaction())
     {
         foreach (DAO* dao, _daos) {
-            foreach (Persistable* persistable, library->getPersistables(dao->getClassName()))
+            QList<Persistable*> persistables = library->getPersistables(dao->getClassName());
+            foreach (Persistable* persistable, persistables)
                 persistable->save();
         }
         QSqlDatabase::database().commit();
