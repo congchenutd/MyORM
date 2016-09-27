@@ -16,6 +16,8 @@ public:
     static LibraryDAO* getInstance();
 
     // A persistable class is registered via its DAO object
+    // NOTE: depended classes should be registered before their depending classes
+    // depended objects are loaded/saved first
     void registerDAO(DAO* dao);
 
     void load(LibraryBase* library);

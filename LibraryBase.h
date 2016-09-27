@@ -33,6 +33,7 @@ public:
 
 protected:
     LibraryBase();
+    virtual ~LibraryBase() {}
 
 protected:
     // Class name -> [ID -> Persistable]

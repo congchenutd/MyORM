@@ -68,15 +68,22 @@ void DAO::createRelationshipTables()
     QSqlQuery query;
     foreach (const Relationship& relationship, getAllRelationships())
         query.exec(tr("create table %1 ( \
-                      %2 int references %3 (ID) on delete cascade on update cascade, \
-                      %4 int references %5 (ID) on delete cascade on update cascade, \
-                      primary key (%2, %4) \
-               )").arg(relationship.getRelationshipTableName())
-                  .arg(relationship.getMainRelationID())
-                  .arg(relationship.getMainTableName())
-                  .arg(relationship.getForeignRelationID())
-                  .arg(relationship.getForeignTableName())
+                          %2 int references %3 (ID) on delete cascade on update cascade, \
+                          %4 int references %5 (ID) on delete cascade on update cascade, \
+                          primary key (%2, %4) \
+                      )").arg(relationship.getRelationshipTableName())
+                         .arg(relationship.getMainRelationID())
+                         .arg(relationship.getMainTableName())
+                         .arg(relationship.getForeignRelationID())
+                         .arg(relationship.getForeignTableName())
                    );
+
+//    E.g., Invoice and Provider
+//    create table Invoice_Provider (
+//        InvoiceID   int references Invoice (ID) on delete cascade on update cascade,
+//        ProviderID  int references Provider(ID) on delete cascade on update cascade,
+//        primary key (InvoiceID, ProviderID)
+//    )
 }
 
 void DAO::update(Persistable* persistable)
@@ -117,14 +124,8 @@ void DAO::insert(Persistable* persistable)
 
     query.bindValue(":ID", persistable->getID());
     foreach (const Mapping& mapping, _mappings)
-    {
         query.bindValue(":" + mapping._fieldName, persistable->property(mapping._propertyName.toLatin1()));
-        qDebug() << mapping._propertyName.toLatin1();
-        qDebug() << persistable->property(mapping._propertyName.toLatin1());
-    }
     query.exec();
-
-    qDebug() << query.lastError().text();
 
     insertRelationships(persistable);
 }

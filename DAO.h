@@ -23,13 +23,14 @@ struct Mapping
 };
 
 /**
- * DAO is the interface for all DAO classes
+ * DAO is the base for all DAO classes
  * Each DAO takes care of one Persistable
  */
 class DAO: public QObject
 {
 public:
     DAO(const QString& className);
+    virtual ~DAO() {}
 
     // Save the persistable object into the database
     void save(Persistable* persistable);
@@ -40,7 +41,7 @@ public:
     // SQL table name of the persistables
     QString getTableName() const;
 
-    // Persistable class name
+    // Persistable class name, same as table name
     QString getClassName() const;
 
     // Generate next ID for the persistable, starting from 1
@@ -52,19 +53,22 @@ public:
     // delete the persistable and its relations
     void remove(Persistable* persistable);
 
+    // Add a property->field mapping
     void addMapping(const QString& propertyName, const QString& fieldName, const QString& typeName);
 
+    // Add an entity relationship
     void addRelationships(const Relationship& relationship);
+
     QList<Relationship> getAllRelationships() const;
 
-    // Create SQL table for the persistable class
+    // Create the SQL table for the persistable class
     void createTable();
 
 protected:
     // Create SQL table for the relationships of the persistable
     void createRelationshipTables();
 
-    // update an existing persistable
+    // update an existing persistable in the db
     void update(Persistable* persistable);
 
     // insert a new persistable into db
@@ -80,6 +84,7 @@ protected:
     void insertRelationships(Persistable* persistable);
 
     // Create an instance of the persistable class
+    // Subclasses have to override this method to create a concrete Persistable object
     virtual Persistable* createObject(int id) = 0;
 
 protected:
