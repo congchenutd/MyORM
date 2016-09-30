@@ -7,12 +7,20 @@ Invoice::Invoice(int id)
 {
 }
 
-QDate Invoice::getDate() const {
-    return _date;
+QVariantList Invoice::getServiceDates() const {
+    return _serviceDates;
 }
 
-void Invoice::setDate(const QDate& date) {
-    _date = date;
+void Invoice::setServiceDates(const QVariantList& dates) {
+    _serviceDates = dates;
+}
+
+QDate Invoice::getInvoiceDate() const {
+    return _invoiceDate;
+}
+
+void Invoice::setInvoiceDate(const QDate& date) {
+    _invoiceDate = date;
 }
 
 double Invoice::getAmount() const {
@@ -29,6 +37,14 @@ QString Invoice::getNote() const {
 
 void Invoice::setNote(const QString& note) {
     _note = note;
+}
+
+Invoice::State Invoice::getState() const {
+    return _state;
+}
+
+void Invoice::setState(Invoice::State state) {
+    _state = state;
 }
 
 Provider* Invoice::getProvider() const {
@@ -78,9 +94,10 @@ InvoiceDAO* InvoiceDAO::getInstance()
 InvoiceDAO::InvoiceDAO()
     : DAO("Invoice")
 {
-    addMapping("Date",    "DATE",     "Date");
-    addMapping("Amount",  "AMOUNT",   "double");
-    addMapping("Note",    "NOTE",     "varchar");
+    addMapping("ServiceDates",  "SERVICEDATES", "varchar");
+    addMapping("InvoiceDate",   "INVOICEDATE",  "Date");
+    addMapping("Amount",        "AMOUNT",       "double");
+    addMapping("Note",          "NOTE",         "varchar");
     addRelationships(Relationship("Invoice", "Provider"));
     createTable();
 }

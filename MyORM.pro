@@ -19,7 +19,8 @@ SOURCES +=\
     Relationship.cpp \
 	LibraryBase.cpp \
     LibraryDAO.cpp \
-    Example.cpp
+    Example.cpp \
+    PropertyPrinter.cpp
 
 HEADERS  += \
     Persistable.h \
@@ -27,6 +28,7 @@ HEADERS  += \
     Relationship.h \
 	LibraryBase.h \
     LibraryDAO.h \
-    Example.h
+    Example.h \
+    PropertyPrinter.h
 
 FORMS    +=

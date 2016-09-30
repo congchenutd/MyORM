@@ -2,11 +2,13 @@
 #include "LibraryBase.h"
 #include "Persistable.h"
 #include "LibraryDAO.h"
+#include "PropertyPrinter.h"
 #include <QMetaProperty>
 #include <QSqlQuery>
 #include <QVariant>
 #include <QDebug>
 #include <QSqlError>
+#include <QDate>
 
 DAO::DAO(const QString& className)
     : _className(className)
@@ -98,8 +100,16 @@ void DAO::update(Persistable* persistable)
                         .arg(sections.join(", "))
                         .arg(persistable->getID()));
 
+    PropertyPrinterFactory printerFactory;
     foreach (const Mapping& mapping, _mappings)
-        query.bindValue(":" + mapping._fieldName, persistable->property(mapping._propertyName.toLatin1()));
+    {
+        const char* propertyName = mapping._propertyName.toLatin1();
+        const QMetaObject* metaObj = persistable->metaObject();
+        int propertyIndex = metaObj->indexOfProperty(propertyName);
+        QMetaProperty property = metaObj->property(propertyIndex);
+        PropertyPrinter* printer = printerFactory.createPrinter(persistable, property);
+        query.bindValue(":" + mapping._fieldName, printer->print(persistable, property));
+    }
     query.exec();
 
     updateRelationships(persistable);
@@ -123,8 +133,17 @@ void DAO::insert(Persistable* persistable)
                         .arg(values.join(", ")));
 
     query.bindValue(":ID", persistable->getID());
+
+    PropertyPrinterFactory printerFactory;
     foreach (const Mapping& mapping, _mappings)
-        query.bindValue(":" + mapping._fieldName, persistable->property(mapping._propertyName.toLatin1()));
+    {
+        const char* propertyName = mapping._propertyName.toLatin1();
+        const QMetaObject* metaObj = persistable->metaObject();
+        int propertyIndex = metaObj->indexOfProperty(propertyName);
+        QMetaProperty property = metaObj->property(propertyIndex);
+        PropertyPrinter* printer = printerFactory.createPrinter(persistable, property);
+        query.bindValue(":" + mapping._fieldName, printer->print(persistable, property));
+    }
     query.exec();
 
     insertRelationships(persistable);
@@ -167,6 +186,23 @@ Persistable* DAO::load(int id)
     foreach (const Mapping& mapping, _mappings)
     {
         QVariant value = query.value(mapping._fieldName);
+
+        if (value.canConvert(QVariant::String))
+        {
+            QString stringValue = value.toString();
+            if (stringValue.contains("##"))
+            {
+                QStringList sections = stringValue.split("##");
+                QVariantList list;
+                foreach (const QString& section, sections)
+                {
+                    list << QDate::fromString(section, "yyyy-MM-dd");
+                }
+                result->setProperty(mapping._propertyName.toLatin1(), list);
+                continue;
+            }
+        }
+
         result->setProperty(mapping._propertyName.toLatin1(), value);
     }
 
