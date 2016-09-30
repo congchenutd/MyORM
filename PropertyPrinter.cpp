@@ -1,8 +1,11 @@
 #include "Persistable.h"
 #include "PropertyPrinter.h"
+#include "Constants.h"
 #include <QMetaObject>
 #include <QMetaProperty>
 #include <QMetaEnum>
+
+PropertyPrinter::~PropertyPrinter() {}
 
 QString SimplePropertyPrinter::print(Persistable* persistable, const QMetaProperty& property) const {
     return persistable->property(property.name()).toString();
@@ -11,9 +14,8 @@ QString SimplePropertyPrinter::print(Persistable* persistable, const QMetaProper
 
 QString EnumPropertyPrinter::print(Persistable* persistable, const QMetaProperty& property) const
 {
-    QMetaEnum enumerator = property.enumerator();
-    int value = persistable->property(property.name()).toInt();
-    return enumerator.valueToKeys(value);
+    int value = persistable->property(property.name()).toInt(); // the value of an enum is saved as int in QVariant
+    return property.enumerator().valueToKeys(value);
 }
 
 
@@ -23,9 +25,9 @@ QString ListPropertyPrinter::print(Persistable* persistable, const QMetaProperty
     foreach (const QVariant& value, persistable->property(property.name()).toList())
         result << value.toString();
 
-    const QString separator("##");
-    return result.join(separator);
+    return result.join(LIST_SEPARATOR);
 }
+
 
 PropertyPrinter* PropertyPrinterFactory::createPrinter(Persistable* persistable, const QMetaProperty& property) const
 {
@@ -41,11 +43,11 @@ PropertyPrinter* PropertyPrinterFactory::createPrinter(Persistable* persistable,
 
 QString PersistablePrinter::print(Persistable* persistable) const
 {
-    PropertyPrinterFactory factory;
     QStringList result;
 
+    PropertyPrinterFactory factory;
     const QMetaObject* metaObj = persistable->metaObject();
-    int count = metaObj->propertyCount();
+    const int count = metaObj->propertyCount();
     for (int i = metaObj->propertyOffset(); i < count; ++i)
     {
         QMetaProperty property = metaObj->property(i);
@@ -54,3 +56,4 @@ QString PersistablePrinter::print(Persistable* persistable) const
     }
     return result.join("\n");
 }
+

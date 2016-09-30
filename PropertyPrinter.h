@@ -6,9 +6,14 @@
 class Persistable;
 class QMetaProperty;
 
+/**
+ * PropertyPrinters convert the value (QVariant) of a QMetaProperty into QString
+ * They are used to write properties into SQL db
+ */
 class PropertyPrinter
 {
 public:
+    virtual ~PropertyPrinter();
     virtual QString print(Persistable* persistable, const QMetaProperty& property) const = 0;
 };
 
@@ -38,6 +43,9 @@ public:
 };
 
 
+/**
+ * Prints the entire object
+ */
 class PersistablePrinter
 {
 public:

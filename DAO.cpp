@@ -3,6 +3,7 @@
 #include "Persistable.h"
 #include "LibraryDAO.h"
 #include "PropertyPrinter.h"
+#include "PropertyWriter.h"
 #include <QMetaProperty>
 #include <QSqlQuery>
 #include <QVariant>
@@ -186,24 +187,8 @@ Persistable* DAO::load(int id)
     foreach (const Mapping& mapping, _mappings)
     {
         QVariant value = query.value(mapping._fieldName);
-
-        if (value.canConvert(QVariant::String))
-        {
-            QString stringValue = value.toString();
-            if (stringValue.contains("##"))
-            {
-                QStringList sections = stringValue.split("##");
-                QVariantList list;
-                foreach (const QString& section, sections)
-                {
-                    list << QDate::fromString(section, "yyyy-MM-dd");
-                }
-                result->setProperty(mapping._propertyName.toLatin1(), list);
-                continue;
-            }
-        }
-
-        result->setProperty(mapping._propertyName.toLatin1(), value);
+        PropertyWriter* writer = PropertyWriterFactory::getInstance()->createWriter(value);
+        writer->write(result, mapping._propertyName, value);
     }
 
     // Load relationships

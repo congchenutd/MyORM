@@ -20,7 +20,8 @@ SOURCES +=\
 	LibraryBase.cpp \
     LibraryDAO.cpp \
     Example.cpp \
-    PropertyPrinter.cpp
+    PropertyPrinter.cpp \
+    PropertyWriter.cpp
 
 HEADERS  += \
     Persistable.h \
@@ -29,6 +30,8 @@ HEADERS  += \
 	LibraryBase.h \
     LibraryDAO.h \
     Example.h \
-    PropertyPrinter.h
+    PropertyPrinter.h \
+    PropertyWriter.h \
+    Constants.h
 
 FORMS    +=

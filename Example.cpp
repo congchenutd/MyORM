@@ -98,6 +98,7 @@ InvoiceDAO::InvoiceDAO()
     addMapping("InvoiceDate",   "INVOICEDATE",  "Date");
     addMapping("Amount",        "AMOUNT",       "double");
     addMapping("Note",          "NOTE",         "varchar");
+    addMapping("State",         "STATE",        "varchar");
     addRelationships(Relationship("Invoice", "Provider"));
     createTable();
 }
