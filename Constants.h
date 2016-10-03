@@ -3,6 +3,6 @@
 
 #define DATE_FORMAT "yyyy-MM-dd"
 
-#define LIST_SEPARATOR "##"
+#define LIST_SEPARATOR "; "
 
 #endif // CONSTANTS_H

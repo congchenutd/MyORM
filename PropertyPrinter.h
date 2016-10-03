@@ -49,7 +49,8 @@ public:
 class PersistablePrinter
 {
 public:
-    QString print(Persistable* persistable) const;
+    QString toText(Persistable* persistable) const;
+    QString toHtml(Persistable* persistable) const;
 };
 
 #endif

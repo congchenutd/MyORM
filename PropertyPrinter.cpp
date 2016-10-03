@@ -41,7 +41,7 @@ PropertyPrinter* PropertyPrinterFactory::createPrinter(Persistable* persistable,
     return new SimplePropertyPrinter;
 }
 
-QString PersistablePrinter::print(Persistable* persistable) const
+QString PersistablePrinter::toText(Persistable* persistable) const
 {
     QStringList result;
 
@@ -57,3 +57,19 @@ QString PersistablePrinter::print(Persistable* persistable) const
     return result.join("\n");
 }
 
+QString PersistablePrinter::toHtml(Persistable *persistable) const
+{
+    const QMetaObject* metaObj = persistable->metaObject();
+    QString result = QString("<H2>") + metaObj->className() + "</H2>";
+
+    QStringList printedProperties;
+    PropertyPrinterFactory factory;
+    const int count = metaObj->propertyCount();
+    for (int i = metaObj->propertyOffset(); i < count; ++i)
+    {
+        QMetaProperty property = metaObj->property(i);
+        PropertyPrinter* printer = factory.createPrinter(persistable, property);
+        printedProperties << QString::fromLatin1(property.name()) + ": " + printer->print(persistable, property);
+    }
+    return result + "<P>" + printedProperties.join("<BR>") + "</P>";
+}

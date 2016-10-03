@@ -3,7 +3,8 @@
 #include <QDebug>
 
 Invoice::Invoice(int id)
-    : Persistable (id, InvoiceDAO::getInstance())
+    : Persistable (id, InvoiceDAO::getInstance()),
+      _provider(0)
 {
 }
 

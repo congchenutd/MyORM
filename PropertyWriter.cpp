@@ -52,9 +52,9 @@ void DateListPropertyWriter::write(Persistable* persistable, const QString& prop
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
-PropertyWriterFactory::PropertyWriterFactory()
-{
-    _writers << new DateListPropertyWriter << new PropertyWriter;
+PropertyWriterFactory::PropertyWriterFactory() {
+    _writers << new DateListPropertyWriter
+             << new PropertyWriter;
 }
 
 PropertyWriterFactory* PropertyWriterFactory::getInstance()
