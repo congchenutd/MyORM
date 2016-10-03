@@ -187,8 +187,9 @@ Persistable* DAO::load(int id)
     foreach (const Mapping& mapping, _mappings)
     {
         QVariant value = query.value(mapping._fieldName);
-        PropertyWriter* writer = PropertyWriterFactory::getInstance()->createWriter(value);
-        writer->write(result, mapping._propertyName, value);
+        QVariant convertedValue = PropertyLoader::\
+                loadValue(value);
+        result->setProperty(mapping._propertyName.toLatin1(), convertedValue);
     }
 
     // Load relationships

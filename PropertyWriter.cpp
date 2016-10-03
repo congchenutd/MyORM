@@ -4,17 +4,34 @@
 #include "Constants.h"
 #include <QDate>
 
-PropertyWriter::~PropertyWriter() {}
+PropertyLoader::~PropertyLoader() {}
 
-bool PropertyWriter::canWrite(const QVariant& value) const
+QList<PropertyLoader*> PropertyLoader::_loaders;
+
+/**
+ * Converts the value into a value compatible with QObject's property system
+ */
+QVariant PropertyLoader::loadValue(const QVariant& value)
+{
+    _loaders << new DateListPropertyLoader
+             << new SimplePropertyLoader;
+
+    foreach (PropertyLoader* loader, _loaders)
+        if (loader->canLoad(value))
+            return loader->load(value);
+
+    return QVariant();
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+bool SimplePropertyLoader::canLoad(const QVariant &value) const
 {
     Q_UNUSED(value)
     return true;
 }
 
-void PropertyWriter::write(Persistable* persistable, const QString& propertyName, const QVariant& value) const
-{
-    persistable->setProperty(propertyName.toLatin1(), value);
+QVariant SimplePropertyLoader::load(const QVariant& value) const {
+    return value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -23,7 +40,7 @@ void PropertyWriter::write(Persistable* persistable, const QString& propertyName
  * Determine if the QVariant value is a string separated by DATE_SEPARATOR,
  * e.g., "2016-01-01##2016-01-02"
  */
-bool DateListPropertyWriter::canWrite(const QVariant& value) const
+bool DateListPropertyLoader::canLoad(const QVariant& value) const
 {
     if (value.canConvert(QVariant::String))
     {
@@ -40,7 +57,7 @@ bool DateListPropertyWriter::canWrite(const QVariant& value) const
     return false;
 }
 
-void DateListPropertyWriter::write(Persistable* persistable, const QString& propertyName, const QVariant& value) const
+QVariant DateListPropertyLoader::load(const QVariant& value) const
 {
     QString stringValue = value.toString();
     QStringList sections = stringValue.split(LIST_SEPARATOR);
@@ -48,26 +65,5 @@ void DateListPropertyWriter::write(Persistable* persistable, const QString& prop
     foreach (const QString& section, sections)
         list << QDate::fromString(section, DATE_FORMAT);
 
-    persistable->setProperty(propertyName.toLatin1(), list);
+    return list;
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////
-PropertyWriterFactory::PropertyWriterFactory() {
-    _writers << new DateListPropertyWriter
-             << new PropertyWriter;
-}
-
-PropertyWriterFactory* PropertyWriterFactory::getInstance()
-{
-    static PropertyWriterFactory instance;
-    return &instance;
-}
-
-PropertyWriter* PropertyWriterFactory::createWriter(const QVariant& value) const
-{
-    foreach (PropertyWriter* writer, _writers)
-        if (writer->canWrite(value))
-            return writer;
-    return 0;
-}
-

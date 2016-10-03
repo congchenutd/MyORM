@@ -4,48 +4,46 @@
 #include <QString>
 #include <QVariant>
 
-
 class Persistable;
 
 
 /**
- * Writers write a QVariant value (from sql table) into an object's property
+ * Converts a QVariant value (from sql table) into an object's property
  */
-class PropertyWriter
+class PropertyLoader
 {
 public:
-    virtual ~PropertyWriter();
-    virtual bool canWrite(const QVariant& value) const;
-    virtual void write(Persistable* persistable, const QString& propertyName, const QVariant& value) const;
+    virtual ~PropertyLoader();
+    virtual bool        canLoad (const QVariant& value) const = 0;
+    virtual QVariant    load    (const QVariant& value) const = 0;
+
+    static QVariant loadValue(const QVariant& value);
+
+private:
+    static QList<PropertyLoader*> _loaders;
+};
+
+/**
+ * Converts simple QVariant values
+ */
+class SimplePropertyLoader: public PropertyLoader
+{
+public:
+    bool        canLoad (const QVariant& value) const;
+    QVariant    load    (const QVariant& value) const;
 };
 
 /**
  * QList<QDate> is represented as QVariantList in Persistables,
  * and saved in SQL as a string separated by DATE_SEPARATOR, e.g., "2016-01-01##2016-01-02"
  *
- * This writer converts that string into QVariantList, in which an item (QVariant) holds a QDate
+ * This Loader converts that string into QVariantList, in which an item (QVariant) holds a QDate
  */
-class DateListPropertyWriter: public PropertyWriter
+class DateListPropertyLoader: public PropertyLoader
 {
 public:
-    bool canWrite(const QVariant& value) const;
-    void write(Persistable* persistable, const QString& propertyName, const QVariant& value) const;
-};
-
-/**
- * Creates a writer base on the value
- */
-class PropertyWriterFactory
-{
-public:
-    static PropertyWriterFactory* getInstance();
-    PropertyWriter* createWriter(const QVariant& value) const;
-
-private:
-    PropertyWriterFactory();
-
-private:
-    QList<PropertyWriter*> _writers;
+    bool        canLoad (const QVariant& value) const;
+    QVariant    load    (const QVariant& value) const;
 };
 
 #endif // PROPERTYWRITER_H
